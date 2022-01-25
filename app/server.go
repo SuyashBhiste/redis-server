@@ -7,6 +7,14 @@ import (
 	"os"    // Control Program
 )
 
+func encodeSimpleString(str string) string {
+	return "+" + str + "\r\n"
+}
+
+func decodeSimpleString(str string) string {
+	return str[1 : len(str)-2]
+}
+
 func main() {
 	fmt.Println("Your code goes here!")
 
@@ -27,12 +35,14 @@ func main() {
 	// Chat
 	for {
 		// Read client commands
-		_, err := bufio.NewReader(conn).ReadString('\n')
+		revMsg, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
 			fmt.Print(err.Error())
 		}
 
 		// Respond to client
-		conn.Write([]byte("+PONG\r\n"))
+		if decodeSimpleString(revMsg) == "PING" {
+			conn.Write([]byte(encodeSimpleString("PONG")))
+		}
 	}
 }
