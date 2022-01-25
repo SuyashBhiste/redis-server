@@ -12,7 +12,7 @@ func encodeSimpleString(str string) string {
 }
 
 func decodeSimpleString(str string) string {
-	return str[1 : len(str)-2]
+	return str[1 : len(str)-4]
 }
 
 func main() {
