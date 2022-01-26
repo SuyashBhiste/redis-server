@@ -5,14 +5,98 @@ import (
 	"fmt"   // Send Message
 	"net"   // Connection Socket
 	"os"    // Control Program
+	"strconv"
+	"strings"
+	"unicode"
 )
 
-func encodeSimpleString(str string) string {
+/////////////////////////////////////////////
+// Simple Strings +Messaga\r\n
+func encodeSimpleStrings(str string) string {
 	return "+" + str + "\r\n"
 }
 
-func decodeSimpleString(str string) string {
-	return str[1 : len(str)-4]
+func decodeSimpleStrings(cmd string) string {
+	return cmd[1 : len(cmd)-6]
+}
+
+// Bulk Strings $4\r\nPing\r\n
+func encodeBulkStrings(str string) string {
+	return "$" + strconv.Itoa(len(str)) + "\r\n" + str + "\r\n"
+}
+
+func decodeBulkStrings(cmd string) string {
+	for index, char := range cmd[1:] {
+		if !unicode.IsNumber(char) {
+			cmd = cmd[index:]
+			break
+		}
+	}
+	return cmd[5 : len(cmd)-6]
+}
+
+// Arrays *3\r\n$3\r\nSET\r\n$4\r\nDING\r\n$4DONG\r\n
+func encodeArrays(str string) string {
+	result := "*" + string(rune(len(str))) + "\r\n"
+
+	list := strings.Split(str, " ")
+	for _, word := range list {
+		result += encodeBulkStrings(word)
+	}
+
+	return result
+}
+
+func decodeArrays(cmd string) string {
+	result := ""
+	var prevIndex int = 6
+	var prevChar string = "$"
+	for index, letter := range cmd[7:] {
+		if letter == '$' {
+			result += decodeBulkStrings(cmd[prevIndex:index])
+			prevIndex = index + 1
+			prevChar = "$"
+		} else if letter == '+' {
+			result += decodeSimpleStrings(cmd[prevIndex:index])
+			prevIndex = index + 1
+			prevChar = "+"
+		} else if letter == '*' {
+			result += decodeArrays(cmd[prevIndex:index])
+			prevIndex = index + 1
+			prevChar = "*"
+		}
+		if index == len(cmd[7:])-1 {
+			if prevChar == "$" {
+				result += decodeBulkStrings(cmd[prevIndex:])
+			} else if prevChar == "+" {
+				result += decodeSimpleStrings(cmd[prevIndex:])
+			} else if prevChar == "*" {
+				result += decodeArrays(cmd[prevIndex:])
+			}
+		}
+	}
+	return result
+}
+
+/////////////////////////////////////////////
+func decode(cmd string) string {
+	var decodedMsg string
+
+	switch cmd[0] {
+	case '+':
+		decodedMsg = decodeSimpleStrings(cmd)
+		break
+
+	case '$':
+		decodedMsg = decodeBulkStrings(cmd)
+		break
+
+	case '*':
+		decodedMsg = decodeArrays(cmd)
+		break
+	}
+
+	return decodedMsg
 }
 
 func main() {
@@ -32,17 +116,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Chat
+	// Communicate
 	for {
-		// Read client commands
-		revMsg, err := bufio.NewReader(conn).ReadString('\n')
-		if err != nil {
-			fmt.Print(err.Error())
-		}
+		revMsg, _ := bufio.NewReader(conn).ReadString('\n')
 
-		// Respond to client
-		if decodeSimpleString(revMsg) == "PING" {
-			conn.Write([]byte(encodeSimpleString("PONG")))
+		switch decode(revMsg) {
+		case "PING":
+			conn.Write([]byte(encodeSimpleStrings("PONG")))
+			break
 		}
 	}
 }
