@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bufio" // Read Input
-	"fmt"   // Send Message
-	"net"   // Connection Socket
-	"os"    // Control Program
+	"bufio"
+	"fmt"
+	"net"
+	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -119,6 +119,7 @@ func main() {
 	// Communicate
 	for {
 		revMsg, _ := bufio.NewReader(conn).ReadString('\n')
+		fmt.Println(revMsg)
 
 		switch decode(revMsg) {
 		case "PING":
