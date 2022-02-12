@@ -109,15 +109,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Accept the client connection
-	conn, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
-
 	// Communicate
 	for {
+		// Accept the client connection
+		conn, err := l.Accept()
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
+		}
 		revMsg, _ := bufio.NewReader(conn).ReadString('\n')
 		fmt.Println(revMsg)
 
@@ -126,5 +125,7 @@ func main() {
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
 			break
 		}
+
+		conn.Close()
 	}
 }
