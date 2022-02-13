@@ -109,23 +109,44 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Accept the client connection
+	conn, err := l.Accept()
+	if err != nil {
+		fmt.Println("Error accepting connection: ", err.Error())
+		os.Exit(1)
+	}
+
 	// Communicate
 	for {
-		// Accept the client connection
-		conn, err := l.Accept()
+		msg, err := bufio.NewReader(conn).ReadString('\n')
 		if err != nil {
-			fmt.Println("Error accepting connection: ", err.Error())
-			os.Exit(1)
+			fmt.Println("Error reading input")
 		}
-		revMsg, _ := bufio.NewReader(conn).ReadString('\n')
-		fmt.Println(revMsg)
 
-		switch decode(revMsg) {
+		if msg[0] != '*' {
+			fmt.Println("Ooops!!! It was not *")
+			break
+		}
+
+		msg, err = bufio.NewReader(conn).ReadString('\n')
+		if err != nil {
+			fmt.Println("Error reading input")
+		}
+
+		if msg[0] != '$' {
+			fmt.Println("Ooops!!! It was not $")
+			break
+		}
+
+		msg, err = bufio.NewReader(conn).ReadString('\n')
+		if err != nil {
+			fmt.Println("Error reading input")
+		}
+
+		switch msg[0 : len(msg)-2] {
 		case "PING":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
 			break
 		}
-
-		conn.Close()
 	}
 }
