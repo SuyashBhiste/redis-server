@@ -118,36 +118,18 @@ func main() {
 	// Communicate
 	for {
 		var buffer [512]byte
-		length, err := conn.Read(buffer[0:])
+		length, err := conn.Read(buffer[:])
 		if err != nil {
 			fmt.Println("Error reading input" + err.Error())
 		}
-		msg := string(buffer[0:length])
-		fmt.Println(length)
-		fmt.Println(msg)
+		msg := string(buffer)
 
-		length, err = conn.Read(buffer[0:])
-		if err != nil {
-			fmt.Println("Error reading input" + err.Error())
-		}
-		msg = string(buffer[0:length])
-		fmt.Println(length)
-		fmt.Println(msg)
 
-		length, err = conn.Read(buffer[0:])
-		if err != nil {
-			fmt.Println("Error reading input" + err.Error())
-		}
-		msg = string(buffer[0:length])
-		fmt.Println(length)
-		fmt.Println(msg)
-		fmt.Println("--------")
-		fmt.Println(len(msg))
-
-		switch msg[0 : len(msg)-2] {
+		switch msg[8 : len(msg)-2] {
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
 			break
 		}
 	}
 }
+566666
