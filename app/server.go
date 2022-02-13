@@ -122,7 +122,7 @@ func main() {
 		if err != nil {
 			fmt.Println("Error reading input" + err.Error())
 		}
-		msg := string(buffer)
+		msg := string(buffer[0:length])
 
 		switch msg[8 : len(msg)-2] {
 		case "ping":
