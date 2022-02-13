@@ -124,7 +124,6 @@ func main() {
 		}
 		msg := string(buffer)
 
-
 		switch msg[8 : len(msg)-2] {
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
@@ -132,4 +131,3 @@ func main() {
 		}
 	}
 }
-566666
