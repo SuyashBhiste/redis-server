@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"net"
 	"os"
@@ -118,33 +117,30 @@ func main() {
 
 	// Communicate
 	for {
-		msg, err := bufio.NewReader(conn).ReadString('\n')
+		var buffer [512]byte
+		length, err := conn.Read(buffer[0:])
 		if err != nil {
-			fmt.Println("Error reading input")
+			fmt.Println("Error reading input" + err.Error())
 		}
-		fmt.Println("Input Msg 1: " + msg + strconv.Itoa(len(msg)))
+		msg := string(buffer[0:length])
+		fmt.Println(length)
+		fmt.Println(msg)
 
-		if msg[0] != '*' {
-			fmt.Println("Ooops!!! It was not *")
-			break
-		}
-
-		msg, err = bufio.NewReader(conn).ReadString('\n')
+		length, err = conn.Read(buffer[0:])
 		if err != nil {
-			fmt.Println("Error reading input")
+			fmt.Println("Error reading input" + err.Error())
 		}
-		fmt.Println("Input Msg 2: " + msg + strconv.Itoa(len(msg)))
+		msg = string(buffer[0:length])
+		fmt.Println(length)
+		fmt.Println(msg)
 
-		if msg[0] != '$' {
-			fmt.Println("Ooops!!! It was not $")
-			break
-		}
-
-		msg, err = bufio.NewReader(conn).ReadString('\n')
+		length, err = conn.Read(buffer[0:])
 		if err != nil {
-			fmt.Println("Error reading input")
+			fmt.Println("Error reading input" + err.Error())
 		}
-		fmt.Println("Input Msg 3: " + msg + strconv.Itoa(len(msg)))
+		msg = string(buffer[0:length])
+		fmt.Println(length)
+		fmt.Println(msg)
 
 		switch msg[0 : len(msg)-2] {
 		case "PING":
