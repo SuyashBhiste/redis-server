@@ -122,6 +122,7 @@ func main() {
 		if err != nil {
 			fmt.Println("Error reading input")
 		}
+		fmt.Println("Input Msg 1: " + msg + strconv.Itoa(len(msg)))
 
 		if msg[0] != '*' {
 			fmt.Println("Ooops!!! It was not *")
@@ -132,6 +133,7 @@ func main() {
 		if err != nil {
 			fmt.Println("Error reading input")
 		}
+		fmt.Println("Input Msg 2: " + msg + strconv.Itoa(len(msg)))
 
 		if msg[0] != '$' {
 			fmt.Println("Ooops!!! It was not $")
@@ -142,6 +144,7 @@ func main() {
 		if err != nil {
 			fmt.Println("Error reading input")
 		}
+		fmt.Println("Input Msg 3: " + msg + strconv.Itoa(len(msg)))
 
 		switch msg[0 : len(msg)-2] {
 		case "PING":
