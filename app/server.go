@@ -142,7 +142,7 @@ func main() {
 		fmt.Println(length)
 		fmt.Println(msg)
 
-		switch msg[0 : len(msg)-2] {
+		switch msg {
 		case "PING":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
 			break
