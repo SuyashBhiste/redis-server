@@ -116,7 +116,7 @@ func main() {
 		}
 		msg := string(buffer[0:length])
 
-		switch decode(msg) {
+		switch msg[8:length] {
 		// *1\r\n$4\r\nping\r\n
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
