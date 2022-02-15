@@ -127,7 +127,6 @@ func main() {
 			// *1\r\n$4\r\nping\r\n
 			case "ping":
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
-				break
 			}
 		}
 	}
