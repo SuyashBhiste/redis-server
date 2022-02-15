@@ -112,11 +112,12 @@ func main() {
 		var buffer [512]byte
 		length, err := conn.Read(buffer[:])
 		if err != nil {
-			conn.Close()
+			fmt.Println("Failed to read input")
 		}
-		msg := string(buffer[0:length])
+		msg := string(buffer[:length])
+		fmt.Println(msg)
 
-		switch msg[8:length] {
+		switch msg[8 : length-1] {
 		// *1\r\n$4\r\nping\r\n
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
