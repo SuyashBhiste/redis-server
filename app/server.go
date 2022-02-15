@@ -97,17 +97,20 @@ func handleCients(conn net.Conn) {
 		length, err := conn.Read(buffer[:])
 		if err != nil {
 			fmt.Println("Failed to read input" + err.Error())
+			conn.Close()
+			break
 		}
 		msg := string(buffer[:length])
-
-		if strings.Contains(msg, "ECHO") {
-			conn.Write([]byte(encodeSimpleStrings("hey")))
-		}
 
 		switch msg[8 : len(msg)-2] {
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
 			break
+		}
+
+		fmt.Println(msg)
+		if strings.Contains(msg, "ECHO") {
+			conn.Write([]byte(encodeSimpleStrings("hey")))
 		}
 	}
 }
