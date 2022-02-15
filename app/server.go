@@ -100,6 +100,10 @@ func handleCients(conn net.Conn) {
 		}
 		msg := string(buffer[:length])
 
+		if strings.Contains(msg, "ECHO") {
+			conn.Write([]byte(encodeSimpleStrings("hey")))
+		}
+
 		switch msg[8 : len(msg)-2] {
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
