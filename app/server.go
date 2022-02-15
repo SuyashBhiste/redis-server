@@ -90,15 +90,20 @@ func decode(msg string) string {
 	}
 }
 
-func handleCients(conn net.Conn) string {
+func handleCients(conn net.Conn) {
 	var buffer [512]byte
 	length, err := conn.Read(buffer[:])
 	if err != nil {
 		fmt.Println("Failed to read input" + err.Error())
 	}
 	msg := string(buffer[:length])
+	fmt.Println(msg)
 
-	return msg
+	switch msg[8 : len(msg)-2] {
+	// *1\r\n$4\r\nping\r\n
+	case "ping":
+		conn.Write([]byte(encodeSimpleStrings("PONG")))
+	}
 }
 
 func main() {
@@ -120,14 +125,6 @@ func main() {
 			os.Exit(1)
 		}
 
-		for {
-			msg := handleCients(conn)
-
-			switch msg[8 : len(msg)-2] {
-			// *1\r\n$4\r\nping\r\n
-			case "ping":
-				conn.Write([]byte(encodeSimpleStrings("PONG")))
-			}
-		}
+		go handleCients(conn)
 	}
 }
