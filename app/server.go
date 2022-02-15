@@ -92,6 +92,7 @@ func decode(msg string) string {
 
 func handleCients(conn net.Conn) {
 	for {
+		// Input
 		var buffer [512]byte
 		length, err := conn.Read(buffer[:])
 		if err != nil {
@@ -100,9 +101,9 @@ func handleCients(conn net.Conn) {
 		msg := string(buffer[:length])
 
 		switch msg[8 : len(msg)-2] {
-		// *1\r\n$4\r\nping\r\n
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
+			break
 		}
 	}
 }
@@ -117,7 +118,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Communicate
 	for {
 		// Accept the client connection
 		conn, err := l.Accept()
@@ -126,6 +126,7 @@ func main() {
 			os.Exit(1)
 		}
 
+		// Handle multiple clients
 		go handleCients(conn)
 	}
 }
