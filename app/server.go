@@ -77,25 +77,17 @@ func decodeArrays(cmd string) string {
 	return result
 }
 
-/////////////////////////////////////////////
-func decode(cmd string) string {
-	var decodedMsg string
-
-	switch cmd[0] {
+func decode(msg string) string {
+	switch msg[0] {
 	case '+':
-		decodedMsg = decodeSimpleStrings(cmd)
-		break
-
+		return decodeSimpleStrings(msg)
 	case '$':
-		decodedMsg = decodeBulkStrings(cmd)
-		break
-
+		return decodeBulkStrings(msg)
 	case '*':
-		decodedMsg = decodeArrays(cmd)
-		break
+		return decodeArrays(msg)
+	default:
+		return ""
 	}
-
-	return decodedMsg
 }
 
 func main() {
@@ -120,11 +112,12 @@ func main() {
 		var buffer [512]byte
 		length, err := conn.Read(buffer[:])
 		if err != nil {
-			fmt.Println("Error reading input" + err.Error())
+			conn.Close()
 		}
 		msg := string(buffer[0:length])
 
-		switch msg[8 : len(msg)-2] {
+		switch decode(msg) {
+		// *1\r\n$4\r\nping\r\n
 		case "ping":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
 			break
