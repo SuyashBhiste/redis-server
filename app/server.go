@@ -120,13 +120,15 @@ func main() {
 			os.Exit(1)
 		}
 
-		msg := handleCients(conn)
+		for {
+			msg := handleCients(conn)
 
-		switch msg[8 : len(msg)-2] {
-		// *1\r\n$4\r\nping\r\n
-		case "ping":
-			conn.Write([]byte(encodeSimpleStrings("PONG")))
-			break
+			switch msg[8 : len(msg)-2] {
+			// *1\r\n$4\r\nping\r\n
+			case "ping":
+				conn.Write([]byte(encodeSimpleStrings("PONG")))
+				break
+			}
 		}
 	}
 }
