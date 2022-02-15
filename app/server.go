@@ -90,6 +90,17 @@ func decode(msg string) string {
 	}
 }
 
+func handleCients(conn net.Conn) string {
+	var buffer [512]byte
+	length, err := conn.Read(buffer[:])
+	if err != nil {
+		fmt.Println("Failed to read input" + err.Error())
+	}
+	msg := string(buffer[:length])
+
+	return msg
+}
+
 func main() {
 	fmt.Println("Your code goes here!")
 
@@ -100,21 +111,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Accept the client connection
-	conn, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
-
 	// Communicate
 	for {
-		var buffer [512]byte
-		length, err := conn.Read(buffer[:])
+		// Accept the client connection
+		conn, err := l.Accept()
 		if err != nil {
-			fmt.Println("Failed to read input" + err.Error())
+			fmt.Println("Error accepting connection: ", err.Error())
+			os.Exit(1)
 		}
-		msg := string(buffer[:length])
+
+		msg := handleCients(conn)
 
 		switch msg[8 : len(msg)-2] {
 		// *1\r\n$4\r\nping\r\n
