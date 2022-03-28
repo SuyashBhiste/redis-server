@@ -46,10 +46,21 @@ func encodeArrays(str string) string {
 	return result
 }
 
+// *1\r\n$4\r\nPING\r\n
 func decodeArrays(cmd string) string {
+	fmt.Println("Hi I'm decodeArrays")
 	result := ""
 	var prevIndex int = 6
 	var prevChar string = "$"
+	fmt.Println(strconv.Itoa((len(cmd))) + "Previous String: " + cmd)
+	var test string
+	for i := 0; i < len(cmd)-1; i++ {
+		if (cmd[i:i+2] != "\n") && (cmd[i:i+2] != "\r") {
+			test += string(cmd[i])
+		}
+	}
+	fmt.Println(strconv.Itoa((len(test))) + "After String: " + test)
+
 	for index, letter := range cmd[7:] {
 		if letter == '$' {
 			result += decodeBulkStrings(cmd[prevIndex:index])
@@ -74,10 +85,17 @@ func decodeArrays(cmd string) string {
 			}
 		}
 	}
+
 	return result
 }
 
 func decode(msg string) string {
+	if len(msg) == 0 {
+		fmt.Println("decode: Failed input message length is 0")
+		return ""
+	}
+
+	fmt.Println("Hi I'm Decode")
 	switch msg[0] {
 	case '+':
 		return decodeSimpleStrings(msg)
@@ -91,26 +109,27 @@ func decode(msg string) string {
 }
 
 func handleCients(conn net.Conn) {
+	defer conn.Close()
 	for {
-		// Input
+		// Read message from connection
 		var buffer [512]byte
 		length, err := conn.Read(buffer[:])
 		if err != nil {
 			fmt.Println("Failed to read input" + err.Error())
-			conn.Close()
 			break
 		}
 		msg := string(buffer[:length])
+		fmt.Println("handleCients: Succeedd to read input " + msg)
 
-		switch msg[8 : len(msg)-2] {
-		case "ping":
+		// *1\r\n$4\r\nPING\r\n = msg[8 : len(msg)-2]
+		// Send message to connection
+		switch strings.ToUpper(decode(msg)) {
+		case "PING":
 			conn.Write([]byte(encodeSimpleStrings("PONG")))
 			break
-		}
-
-		fmt.Println(msg)
-		if strings.Contains(msg, "ECHO") {
-			conn.Write([]byte(encodeSimpleStrings("hey")))
+		default:
+			fmt.Println("handleClients: Something went wrong!!! Didn't Decode")
+			break
 		}
 	}
 }
@@ -123,6 +142,8 @@ func main() {
 	if err != nil {
 		fmt.Println("Failed to bind to port 6379")
 		os.Exit(1)
+	} else {
+		fmt.Println("Main: Succeedd to bind to port 6379")
 	}
 
 	for {
@@ -130,6 +151,8 @@ func main() {
 		conn, err := l.Accept()
 		if err != nil {
 			fmt.Println("Error accepting connection: ", err.Error())
+		} else {
+			fmt.Println("Main: Succeedd in accepting new connection")
 		}
 
 		// Handle multiple clients
