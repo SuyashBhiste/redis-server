@@ -103,7 +103,7 @@ func handleCients(conn net.Conn) {
 				if (len(commands) > 3) {
 					expiry, _ := strconv.Atoi(commands[4])
 					DataStore[commands[1]] = DataStoreValue{
-						Value: commands[2]
+						Value: commands[2],
 						ttl: time.Now().Add(time.Duration(expiry) * time.Millisecond)
 					}
 				}
