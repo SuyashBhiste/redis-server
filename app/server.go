@@ -149,7 +149,7 @@ func handleCients(conn net.Conn) {
 				break
 			case "SET":
 				DataStoreMutex.Lock()
-				DataStore[ans[1]] = value[2]
+				DataStore[value[1]] = value[2]
 				DataStoreMutex.Unlock()
 				conn.Write([]byte(encodeSimpleStrings("OK")))
 				break
