@@ -129,7 +129,7 @@ func handleCients(conn net.Conn) {
 
 		// Send message to connection
 		ans := decode(msg)
-		fmt.Println("ans is" + ans)
+		fmt.Println("ans is", ans)
 		switch strings.ToUpper(ans[0]) {
 			case "PING":
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
