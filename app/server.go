@@ -109,8 +109,8 @@ func decode(msg string) []string {
 
 		length, _ = strconv.Atoi(msg[index+3:index+4])
 
-		result = append(result, msg[index+5:index+5+length])
-		index = index+length+5
+		result = append(result, msg[index+6:index+7+length])
+		index = index+7+length
 	}
 
 	return result
