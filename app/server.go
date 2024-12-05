@@ -119,7 +119,7 @@ func decode(msg string) []string {
 		fmt.Println("word", msg[index+1:index+1+length])
 
 		result = append(result, msg[index+1:index+1+length])
-		index = index+1+length
+		index = index+2+length
 	}
 
 	return result
