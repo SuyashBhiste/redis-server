@@ -155,7 +155,7 @@ func handleCients(conn net.Conn) {
 
 				if !exists {
 					conn.Write([]byte("$-1\r\n"));
-				} else if (dsVal != nil && time.Now() - dsVal.ttl <= 0) {
+				} else if (dsVal.ttl != nil && time.Now().Sub(dsVal.ttl) <= 0) {
 					delete(DataStore, value[1])
 					conn.Write([]byte("$-1\r\n"));
 				} else {
