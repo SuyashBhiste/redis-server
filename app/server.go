@@ -141,37 +141,37 @@ func handleCients(conn net.Conn) {
 		msg := string(buffer[:length])
 
 		// Send message to connection
-		value := decode(msg)
+		commands := decode(msg)
 		switch strings.ToUpper(value[0]) {
 			case "PING":
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
 				break
 			case "ECHO":
-				conn.Write([]byte(encodeSimpleStrings(value[1])))
+				conn.Write([]byte(encodeSimpleStrings(commands[1])))
 				break
 			case "GET":
 				DataStoreMutex.Lock()
-				dsVal, exists := DataStore[value[1]]
-				fmt.Println("ans is", dsVal)
+				value, exists := DataStore[commands[1]]
+				fmt.Println("ans is", value)
 
 				if !exists {
 					conn.Write([]byte("$-1\r\n"));
-				} else if (dsVal.ttl != time.Time{} && time.Now().Sub(dsVal.ttl) >= 0) {
-					delete(DataStore, value[1])
+				} else if (value.ttl != time.Time{} && time.Now().Sub(value.ttl) >= 0) {
+					delete(DataStore, commands[1])
 					conn.Write([]byte("$-1\r\n"));
 				} else {
-					conn.Write([]byte(encodeSimpleStrings(dsVal.Value)))
+					conn.Write([]byte(encodeSimpleStrings(value.Value)))
 				}
 
 				DataStoreMutex.Unlock()
 				break
 			case "SET":
 				DataStoreMutex.Lock()
-				DataStore[value[1]] = DataStoreValue{ Value: value[2] }
-				if len(value) > 3 {
-					expiry, _ := strconv.Atoi(value[4])
-					data, _ := DataStore[value[1]]
-					data.ttl = time.Now().Add(expiry * time.Millisecond)
+				DataStore[value[1]] = DataStoreValue{ Value: commands[2] }
+				if len(commands) > 3 {
+					expiry, _ := strconv.Atoi(commands[4])
+					data, _ := DataStore[commands[1]]
+					data.ttl = time.Now().Add(time.Duration(expiry) * time.Millisecond)
 				}
 				DataStoreMutex.Unlock()
 				conn.Write([]byte(encodeSimpleStrings("OK")))
