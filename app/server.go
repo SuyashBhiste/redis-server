@@ -111,7 +111,7 @@ func decode(msg string) []string {
 		}
 
 		prev := index
-		index = prev + strings.IndexRune(msg[index+1:], '\n')
+		index = index + strings.IndexRune(msg[index:], '\n')
 		length, _ = strconv.Atoi(msg[prev+1:index-1])
 
 		fmt.Println("hi2", index)
