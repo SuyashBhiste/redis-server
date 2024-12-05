@@ -97,7 +97,7 @@ func decode(msg string) []int {
 		return []int{}
 	}
 
-	index := strings.IndexRune('\r')
+	index := strings.IndexRune(msg, '\r')
 	length := strconv.Atoi(msg[1:index])
 
 	result := []int{}
@@ -108,7 +108,7 @@ func decode(msg string) []int {
 		}
 
 		prev := index
-		index := strings.IndexRune('\r')
+		index := strings.IndexRune(msg[prev+2:], '\r')
 		result = append(result, msg[prev+2:index])
 	}
 
