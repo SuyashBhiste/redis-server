@@ -89,12 +89,12 @@ func decodeArrays(cmd string) string {
 func decode(msg string) []int {
 	if len(msg) == 0 {
 		fmt.Println("decode: Failed input message length is 0")
-		return ""
+		return []
 	}
 
 	if msg[0] != '*' {
 		fmt.Println("Invalid input request")
-		return ""
+		return []
 	}
 
 	index := strings.IndexRune('\r')
@@ -104,7 +104,7 @@ func decode(msg string) []int {
 	for i:=0; i<length; i++ {
 		if msg[index+2] != '$' {
 			fmt.Println("Incomplete input request")
-			return ""
+			return []
 		}
 
 		prev := index
