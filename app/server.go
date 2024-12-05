@@ -151,7 +151,7 @@ func handleCients(conn net.Conn) {
 				break
 			case "GET":
 				DataStoreMutex.Lock()
-				dsVal, exists = DataStore[value[1]]
+				dsVal, exists := DataStore[value[1]]
 
 				if !exists {
 					return "$-1\r\n";
@@ -161,7 +161,7 @@ func handleCients(conn net.Conn) {
 				} else {
 					conn.Write([]byte(encodeSimpleStrings(DataStore[value[1]])))
 				}
-				
+
 				DataStoreMutex.Unlock()
 				break
 			case "SET":
