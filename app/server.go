@@ -103,6 +103,7 @@ func decode(msg string) []string {
 	result := []string{}
 	for i:=0; i<length; i++ {
 		index = index+1
+		fmt.Println("hi1" + index)
 
 		if msg[index] != '$' {
 			fmt.Println("Incomplete input request")
@@ -110,8 +111,10 @@ func decode(msg string) []string {
 		}
 
 		prev := index
-		index := prev + strings.IndexRune(msg[index:], '\n')
-		length, _ := strconv.Atoi(msg[prev+1:index-1])
+		index = prev + strings.IndexRune(msg[index:], '\n')
+		length, _ = strconv.Atoi(msg[prev+1:index-1])
+
+		fmt.Println("hi2" + index)
 
 		result = append(result, msg[index+1:index+1+length])
 		index = index+3+length
