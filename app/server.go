@@ -167,10 +167,15 @@ func handleCients(conn net.Conn) {
 				break
 			case "SET":
 				DataStoreMutex.Lock()
-				DataStore[commands[1]] = DataStoreValue{ Value: commands[2] }
 				if len(commands) > 3 {
 					expiry, _ := strconv.Atoi(commands[4])
-					DataStore[commands[1]].ttl = time.Now().Add(time.Duration(expiry) * time.Millisecond)
+					DataStore[commands[1]] = DataStoreValue{
+						Value: commands[2],
+						ttl: time.Now().Add(time.Duration(expiry) * time.Millisecond)
+					}
+				}
+				else {
+					DataStore[commands[1]] = DataStoreValue{ Value: commands[2] }
 				}
 				DataStoreMutex.Unlock()
 				conn.Write([]byte(encodeSimpleStrings("OK")))
