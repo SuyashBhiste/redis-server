@@ -170,8 +170,7 @@ func handleCients(conn net.Conn) {
 				DataStore[commands[1]] = DataStoreValue{ Value: commands[2] }
 				if len(commands) > 3 {
 					expiry, _ := strconv.Atoi(commands[4])
-					data, _ := DataStore[commands[1]]
-					data.ttl = time.Now().Add(time.Duration(expiry) * time.Millisecond)
+					DataStore[commands[1]].ttl = time.Now().Add(time.Duration(expiry) * time.Millisecond)
 				}
 				DataStoreMutex.Unlock()
 				conn.Write([]byte(encodeSimpleStrings("OK")))
