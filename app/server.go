@@ -48,18 +48,15 @@ func encodeArrays(str string) string {
 
 // *1\r\n$4\r\nPING\r\n
 func decodeArrays(cmd string) string {
-	fmt.Println("Hi I'm decodeArrays")
 	result := ""
 	var prevIndex int = 6
 	var prevChar string = "$"
-	fmt.Println(strconv.Itoa((len(cmd))) + "Previous String: " + cmd)
 	var test string
 	for i := 0; i < len(cmd)-1; i++ {
 		if (cmd[i:i+2] != "\n") && (cmd[i:i+2] != "\r") {
 			test += string(cmd[i])
 		}
 	}
-	fmt.Println(strconv.Itoa((len(test))) + "After String: " + test)
 
 	for index, letter := range cmd[7:] {
 		if letter == '$' {
@@ -89,23 +86,33 @@ func decodeArrays(cmd string) string {
 	return result
 }
 
-func decode(msg string) string {
+func decode(msg string) []int {
 	if len(msg) == 0 {
 		fmt.Println("decode: Failed input message length is 0")
 		return ""
 	}
 
-	fmt.Println("Hi I'm Decode")
-	switch msg[0] {
-	case '+':
-		return decodeSimpleStrings(msg)
-	case '$':
-		return decodeBulkStrings(msg)
-	case '*':
-		return decodeArrays(msg)
-	default:
+	if msg[0] != '*' {
+		fmt.Println("Invalid input request")
 		return ""
 	}
+
+	index := strings.IndexRune('\r')
+	length := strconv.Atoi(msg[1:index])
+
+	result := []int{}
+	for i:=0; i<length; i++ {
+		if msg[index+2] != '$' {
+			fmt.Println("Incomplete input request")
+			return ""
+		}
+
+		prev := index
+		index := strings.IndexRune('\r')
+		result = append(result, msg[prev+2:index])
+	}
+
+	return result
 }
 
 func handleCients(conn net.Conn) {
@@ -119,17 +126,19 @@ func handleCients(conn net.Conn) {
 			break
 		}
 		msg := string(buffer[:length])
-		fmt.Println("handleCients: Succeedd to read input " + msg)
 
-		// *1\r\n$4\r\nPING\r\n = msg[8 : len(msg)-2]
 		// Send message to connection
-		switch strings.ToUpper(decode(msg)) {
-		case "PING":
-			conn.Write([]byte(encodeSimpleStrings("PONG")))
-			break
-		default:
-			fmt.Println("handleClients: Something went wrong!!! Didn't Decode")
-			break
+		ans := decode(msg)
+		fmt.Println("ans is" + ans)
+		switch strings.ToUpper(ans) {
+			case "PING":
+				conn.Write([]byte(encodeSimpleStrings("PONG")))
+				break
+			case "ECHO":
+				conn.Write([]byte())
+			default:
+				fmt.Println("handleClients: Something went wrong!!! Didn't Decode")
+				break
 		}
 	}
 }
