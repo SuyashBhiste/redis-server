@@ -115,9 +115,11 @@ func decode(msg string) []string {
 		length, _ = strconv.Atoi(msg[prev+1:index-1])
 
 		fmt.Println("hi2", index)
+		fmt.Println("length", length)
+		fmt.Println("word", msg[index+1:index+1+length])
 
 		result = append(result, msg[index+1:index+1+length])
-		index = index+3+length
+		index = index+1+length
 	}
 
 	return result
