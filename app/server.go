@@ -169,7 +169,7 @@ func handleCients(conn net.Conn) {
 				DataStoreMutex.Lock()
 				DataStore[value[1]] = DataStoreValue{ Value: value[2] }
 				if len(value) > 3 {
-					expiry, _ := strconv.Atoi(value[4])
+					// expiry, _ := strconv.Atoi(value[4])
 					data, _ := DataStore[value[1]]
 					data.ttl = time.Now()
 					fmt.Println(data)
