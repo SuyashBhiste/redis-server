@@ -18,7 +18,6 @@ type DataStoreValue struct {
 var DataStore = map[string]DataStoreValue{}
 var DataStoreMutex = sync.RWMutex{}
 
-/////////////////////////////////////////////
 // Simple Strings 
 func encodeSimpleStrings(str string) string {
 	return "+" + str + "\r\n"
@@ -26,72 +25,6 @@ func encodeSimpleStrings(str string) string {
 
 func decodeSimpleStrings(cmd string) string {
 	return cmd[1 : len(cmd)-6]
-}
-
-// Bulk Strings 
-func encodeBulkStrings(str string) string {
-	return "$" + strconv.Itoa(len(str)) + "\r\n" + str + "\r\n"
-}
-
-func decodeBulkStrings(cmd string) string {
-	for index, char := range cmd[1:] {
-		if !unicode.IsNumber(char) {
-			cmd = cmd[index:]
-			break
-		}
-	}
-	return cmd[5 : len(cmd)-6]
-}
-
-// Arrays
-func encodeArrays(str string) string {
-	result := "*" + string(rune(len(str))) + "\r\n"
-
-	list := strings.Split(str, " ")
-	for _, word := range list {
-		result += encodeBulkStrings(word)
-	}
-
-	return result
-}
-
-func decodeArrays(cmd string) string {
-	result := ""
-	var prevIndex int = 6
-	var prevChar string = "$"
-	var test string
-	for i := 0; i < len(cmd)-1; i++ {
-		if (cmd[i:i+2] != "\n") && (cmd[i:i+2] != "\r") {
-			test += string(cmd[i])
-		}
-	}
-
-	for index, letter := range cmd[7:] {
-		if letter == '$' {
-			result += decodeBulkStrings(cmd[prevIndex:index])
-			prevIndex = index + 1
-			prevChar = "$"
-		} else if letter == '+' {
-			result += decodeSimpleStrings(cmd[prevIndex:index])
-			prevIndex = index + 1
-			prevChar = "+"
-		} else if letter == '*' {
-			result += decodeArrays(cmd[prevIndex:index])
-			prevIndex = index + 1
-			prevChar = "*"
-		}
-		if index == len(cmd[7:])-1 {
-			if prevChar == "$" {
-				result += decodeBulkStrings(cmd[prevIndex:])
-			} else if prevChar == "+" {
-				result += decodeSimpleStrings(cmd[prevIndex:])
-			} else if prevChar == "*" {
-				result += decodeArrays(cmd[prevIndex:])
-			}
-		}
-	}
-
-	return result
 }
 
 func decode(msg string) []string {
@@ -167,10 +100,10 @@ func handleCients(conn net.Conn) {
 				break
 			case "SET":
 				DataStoreMutex.Lock()
-				if len(commands) > 3 {
+				if (len(commands) > 3) {
 					expiry, _ := strconv.Atoi(commands[4])
 					DataStore[commands[1]] = DataStoreValue{
-						Value: commands[2],
+						Value: commands[2]
 						ttl: time.Now().Add(time.Duration(expiry) * time.Millisecond)
 					}
 				}
