@@ -152,7 +152,7 @@ func handleCients(conn net.Conn) {
 			case "GET":
 				DataStoreMutex.Lock()
 				value, exists := DataStore[commands[1]]
-				fmt.Println("ans is", value)
+				fmt.Println("ans is", DataStore[commands[1]])
 
 				if !exists {
 					conn.Write([]byte("$-1\r\n"));
@@ -175,6 +175,7 @@ func handleCients(conn net.Conn) {
 				}
 				DataStoreMutex.Unlock()
 				conn.Write([]byte(encodeSimpleStrings("OK")))
+				fmt.Println("ans1 is", DataStore[commands[1]])
 				break
 			default:
 				fmt.Println("handleClients: Something went wrong!!! Didn't Decode")
