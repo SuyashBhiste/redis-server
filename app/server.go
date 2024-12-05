@@ -106,8 +106,7 @@ func handleCients(conn net.Conn) {
 						Value: commands[2],
 						ttl: time.Now().Add(time.Duration(expiry) * time.Millisecond),
 					}
-				}
-				else {
+				} else {
 					DataStore[commands[1]] = DataStoreValue{ Value: commands[2] }
 				}
 				DataStoreMutex.Unlock()
