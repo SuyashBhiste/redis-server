@@ -152,10 +152,11 @@ func handleCients(conn net.Conn) {
 			case "GET":
 				DataStoreMutex.Lock()
 				dsVal, exists := DataStore[value[1]]
+				fmt.Println("ans is", dsVal)
 
 				if !exists {
 					conn.Write([]byte("$-1\r\n"));
-				} else if (dsVal.ttl != time.Time{} && time.Now().Sub(dsVal.ttl) > 0) {
+				} else if (dsVal.ttl != time.Time{} && time.Now().Sub(dsVal.ttl) >= 0) {
 					delete(DataStore, value[1])
 					conn.Write([]byte("$-1\r\n"));
 				} else {
