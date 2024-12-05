@@ -142,6 +142,8 @@ func handleCients(conn net.Conn) {
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
 				break
 			case "ECHO":
+				conn.Write([]byte(encodeSimpleStrings(value[1])))
+				break
 			case "GET":
 				DataStoreMutex.Lock()
 				conn.Write([]byte(encodeSimpleStrings(DataStore[value[1]])))
