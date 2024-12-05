@@ -111,7 +111,7 @@ func decode(msg string) []string {
 
 		prev := index
 		index := strings.IndexRune(msg[index+5:index+5+length], '\r')
-		result = append(result, msg[prev+6:prev+index+10])
+		result = append(result, msg[prev+6:prev+index+11])
 	}
 
 	return result
