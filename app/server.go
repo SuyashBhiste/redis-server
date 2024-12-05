@@ -142,7 +142,7 @@ func handleCients(conn net.Conn) {
 
 		// Send message to connection
 		commands := decode(msg)
-		switch strings.ToUpper(value[0]) {
+		switch strings.ToUpper(commands[0]) {
 			case "PING":
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
 				break
@@ -167,7 +167,7 @@ func handleCients(conn net.Conn) {
 				break
 			case "SET":
 				DataStoreMutex.Lock()
-				DataStore[value[1]] = DataStoreValue{ Value: commands[2] }
+				DataStore[commands[1]] = DataStoreValue{ Value: commands[2] }
 				if len(commands) > 3 {
 					expiry, _ := strconv.Atoi(commands[4])
 					data, _ := DataStore[commands[1]]
