@@ -111,7 +111,7 @@ func decode(msg string) []string {
 
 		prev := index
 		index := strings.IndexRune(msg[index:], '\n')
-		length, _ := strconv.Atoi(msg[prev+1:index-1])
+		length, _ := strconv.Atoi(msg[prev+1:prev+index-1])
 
 		result = append(result, msg[index+1:index+1+length])
 		index = index+3+length
