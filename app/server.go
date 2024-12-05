@@ -8,9 +8,14 @@ import (
 	"strings"
 	"unicode"
 	"sync"
+	"time"
 )
 
-var DataStore = map[string]string{}
+type DataStoreValue struct {
+	Value string
+	ttl time.Time
+}
+var DataStore = map[string]DataStoreValue{}
 var DataStoreMutex = sync.RWMutex{}
 
 /////////////////////////////////////////////
@@ -146,12 +151,26 @@ func handleCients(conn net.Conn) {
 				break
 			case "GET":
 				DataStoreMutex.Lock()
-				conn.Write([]byte(encodeSimpleStrings(DataStore[value[1]])))
+				dsVal, exists = DataStore[value[1]]
+
+				if !exists {
+					return "$-1\r\n";
+				} else if (dsVal != nil && time.Now() - dsVal.ttl <= 0) {
+					delete(DataStore, value[1])
+					return "$-1\r\n";
+				} else {
+					conn.Write([]byte(encodeSimpleStrings(DataStore[value[1]])))
+				}
+				
 				DataStoreMutex.Unlock()
 				break
 			case "SET":
 				DataStoreMutex.Lock()
-				DataStore[value[1]] = value[2]
+				DataStore[value[1]] = DataStoreValue{ Value: value[2] }
+				if len(value > 3){
+					expiry := strconv.Atoi(value[4])
+					DataStore[value[1]].ttl = time.Now().Add(expiry * time.Millisecond)
+				}
 				DataStoreMutex.Unlock()
 				conn.Write([]byte(encodeSimpleStrings("OK")))
 				break
