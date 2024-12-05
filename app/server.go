@@ -135,7 +135,7 @@ func handleCients(conn net.Conn) {
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
 				break
 			case "ECHO":
-				conn.Write([]byte())
+				conn.Write([]byte(encodeSimpleStrings(ans[1])))
 			default:
 				fmt.Println("handleClients: Something went wrong!!! Didn't Decode")
 				break
