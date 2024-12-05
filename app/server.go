@@ -86,25 +86,25 @@ func decodeArrays(cmd string) string {
 	return result
 }
 
-func decode(msg string) []int {
+func decode(msg string) []string {
 	if len(msg) == 0 {
 		fmt.Println("decode: Failed input message length is 0")
-		return []int{}
+		return []string{}
 	}
 
 	if msg[0] != '*' {
 		fmt.Println("Invalid input request")
-		return []int{}
+		return []string{}
 	}
 
 	index := strings.IndexRune(msg, '\r')
-	length := strconv.Atoi(msg[1:index])
+	length, err := strconv.Atoi(msg[1:index])
 
 	result := []int{}
 	for i:=0; i<length; i++ {
 		if msg[index+2] != '$' {
 			fmt.Println("Incomplete input request")
-			return []int{}
+			return []string{}
 		}
 
 		prev := index
@@ -130,7 +130,7 @@ func handleCients(conn net.Conn) {
 		// Send message to connection
 		ans := decode(msg)
 		fmt.Println("ans is" + ans)
-		switch strings.ToUpper(ans) {
+		switch strings.ToUpper(ans[0]) {
 			case "PING":
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
 				break
