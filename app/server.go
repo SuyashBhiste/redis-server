@@ -7,10 +7,14 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"sync"
 )
 
+var DataStore = map[string]string{}
+var DataStoreMutex = sync.RWMutex{}
+
 /////////////////////////////////////////////
-// Simple Strings +Messaga\r\n
+// Simple Strings 
 func encodeSimpleStrings(str string) string {
 	return "+" + str + "\r\n"
 }
@@ -19,7 +23,7 @@ func decodeSimpleStrings(cmd string) string {
 	return cmd[1 : len(cmd)-6]
 }
 
-// Bulk Strings $4\r\nPing\r\n
+// Bulk Strings 
 func encodeBulkStrings(str string) string {
 	return "$" + strconv.Itoa(len(str)) + "\r\n" + str + "\r\n"
 }
@@ -34,7 +38,7 @@ func decodeBulkStrings(cmd string) string {
 	return cmd[5 : len(cmd)-6]
 }
 
-// Arrays *3\r\n$3\r\nSET\r\n$4\r\nDING\r\n$4DONG\r\n
+// Arrays
 func encodeArrays(str string) string {
 	result := "*" + string(rune(len(str))) + "\r\n"
 
@@ -46,7 +50,6 @@ func encodeArrays(str string) string {
 	return result
 }
 
-// *1\r\n$4\r\nPING\r\n
 func decodeArrays(cmd string) string {
 	result := ""
 	var prevIndex int = 6
@@ -133,14 +136,23 @@ func handleCients(conn net.Conn) {
 		msg := string(buffer[:length])
 
 		// Send message to connection
-		ans := decode(msg)
-		fmt.Println("ans is", ans)
-		switch strings.ToUpper(ans[0]) {
+		value := decode(msg)
+		switch strings.ToUpper(value[0]) {
 			case "PING":
 				conn.Write([]byte(encodeSimpleStrings("PONG")))
 				break
 			case "ECHO":
-				conn.Write([]byte(encodeSimpleStrings(ans[1])))
+			case "GET":
+				DataStoreMutex.Lock()
+				conn.Write([]byte(encodeSimpleStrings(DataStore[ans[1]])))
+				DataStoreMutex.UnLock()
+				break
+			case "SET":
+				DataStoreMutex.Lock()
+				DataStore[ans[1]] = ans[2]
+				DataStoreMutex.UnLock()
+				conn.Write([]byte(encodeSimpleStrings("OK")))
+				break
 			default:
 				fmt.Println("handleClients: Something went wrong!!! Didn't Decode")
 				break
