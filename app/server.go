@@ -98,7 +98,7 @@ func decode(msg string) []string {
 	}
 
 	index := strings.IndexRune(msg, '\r')
-	length, err := strconv.Atoi(msg[1:index])
+	length, _ := strconv.Atoi(msg[1:index])
 
 	result := []string{}
 	for i:=0; i<length; i++ {
