@@ -154,10 +154,10 @@ func handleCients(conn net.Conn) {
 				dsVal, exists := DataStore[value[1]]
 
 				if !exists {
-					conn.Write([]byte("$-1\r\n");
+					conn.Write([]byte("$-1\r\n"));
 				} else if (dsVal != nil && time.Now() - dsVal.ttl <= 0) {
 					delete(DataStore, value[1])
-					conn.Write([]byte("$-1\r\n");
+					conn.Write([]byte("$-1\r\n"));
 				} else {
 					conn.Write([]byte(encodeSimpleStrings(DataStore[value[1]])))
 				}
