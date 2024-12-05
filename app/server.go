@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"unicode"
 	"sync"
 	"time"
 )
