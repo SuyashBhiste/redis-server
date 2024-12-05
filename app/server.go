@@ -107,11 +107,11 @@ func decode(msg string) []string {
 			return []string{}
 		}
 
-		fmt.Println("index is ", index)
+		fmt.Println("word is ", msg[index])
 
 		prev := index
 		index := strings.IndexRune(msg[prev+2:], '\r')
-		result = append(result, msg[prev+2:index])
+		result = append(result, msg[prev+2:index+prev+2])
 	}
 
 	return result
